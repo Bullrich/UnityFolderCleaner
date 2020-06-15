@@ -1,0 +1,34 @@
+{
+  "name": "dev.bullrich.folder-cleaner",
+  "version": "1.0.0",
+  "displayName": "Folder Cleaner",
+  "description": "Removes all empty folders from the editor",
+  "unity": "2018.4",
+  "unityRelease": "8f1",
+  "keywords": [
+    "asmdef",
+    "debug",
+    "unity"
+  ],
+  "homepage": "https://github.com/Bullrich/UnityFolderCleaner/",
+  "bugs": {
+    "url": "https://github.com/Bullrich/UnityFolderCleaner/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com:Bullrich/UnityFolderCleaner.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Javier Bullrich",
+    "email": "javier@bullrich.dev",
+    "url": "https://bullrich.dev"
+  },
+  "files": [
+    "*.md",
+    "*.meta",
+    "*.asmdef",
+    "*.xml",
+    "*.cs"
+  ]
+}
