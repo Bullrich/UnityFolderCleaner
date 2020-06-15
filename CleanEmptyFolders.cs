@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -13,7 +14,12 @@ public class CleanEmptyFolders : EditorWindow
         deletedFolders = string.Empty;
 
         var directoryInfo = new DirectoryInfo(Application.dataPath);
-        foreach(var subDirectory in directoryInfo.GetDirectories("*.*", SearchOption.AllDirectories))
+
+        var foldersToIgnore = directoryInfo.GetDirectories(".git", SearchOption.AllDirectories);
+        var projectDirectories = directoryInfo.GetDirectories("*.*", SearchOption.AllDirectories)
+            .Where(x => ShouldScan(x.FullName, foldersToIgnore.Select(s => s.FullName)));
+
+        foreach (var subDirectory in projectDirectories)
         {
             if (subDirectory.Exists)
             {
@@ -22,6 +28,17 @@ public class CleanEmptyFolders : EditorWindow
         }
 
         Debug.Log("Deleted Folders:\n" + (deletedFolders.Length > 0 ? deletedFolders : "NONE"));
+        AssetDatabase.Refresh();
+    }
+
+    private static bool ShouldScan(string folder, IEnumerable<string> ignored)
+    {
+        if (ignored.Any(folder.StartsWith))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     private static string ScanDirectory(DirectoryInfo subDirectory)
