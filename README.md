@@ -12,6 +12,12 @@ It will scan all the folders in your project and delete empty folders.
 
 ## Installation
 
+### Using Open UPM
+
+You can install this package using [OpenUPM](https://openupm.com/)'s command line tool:
+
+`openupm add dev.bullrich.folder-cleaner`
+
 ### Adding the package to the Unity project manifest
 
 * Navigate to the `Packages` directory of your project.
@@ -41,9 +47,9 @@ It will scan all the folders in your project and delete empty folders.
   ```
 * Switch back to the Unity software and wait for it to finish importing the added package.
 
-### Added test
+### Add editor test
 
-There is a unit test to ensure that there is no empty directories in the project.
+There is a unit test to ensure that there are no empty directories in the project.
 
 If you want to add this test to your project you can add it following this steps:
 
@@ -65,6 +71,7 @@ If you want to add this test to your project you can add it following this steps
     }
   }
   ```
+  
 * As noted in the [official Unity documentation][Enable-Tests]:
   > **NOTE**: You may need to re-import the package, because the test framework doesn't always immediately pick up changes to the `testables` attribute.
   * Within the Unity software's `Project` window expand the `Packages` node.
