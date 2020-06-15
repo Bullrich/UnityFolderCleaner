@@ -1,13 +1,16 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using NUnit.Framework;
 
 namespace FolderCleaner.Tests
 {
     public class EmptyFoldersTest
     {
         [Test]
-        public void EnsureAllProjectDirectoriesAreEmpty()
+        public void EnsureThereAreNoEmptyDirectories()
         {
-            Assert.IsEmpty(CleanEmptyFolders.GetEmptyDirectories());
+            var emptyDirectories =
+                CleanEmptyFolders.GetEmptyDirectories().Select(CleanEmptyFolders.GetRootDirectoryName);
+            Assert.IsEmpty(emptyDirectories);
         }
     }
 }

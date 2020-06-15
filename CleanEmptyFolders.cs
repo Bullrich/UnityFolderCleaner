@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -13,7 +14,6 @@ namespace FolderCleaner
         {
             var emptyDirectories = GetEmptyDirectories();
 
-            var emptyDirectoryNames = emptyDirectories.Select(ed => ed.FullName);
 
             foreach (var directory in emptyDirectories)
             {
@@ -23,13 +23,22 @@ namespace FolderCleaner
                 }
             }
 
-            Debug.Log("Deleted Folders:\n" +
-                      (emptyDirectories.Count > 0 ? string.Join("\n", emptyDirectoryNames) : "NONE"));
+            if (emptyDirectories.Count > 0)
+            {
+                var emptyDirectoryNames = emptyDirectories.Select(GetRootDirectoryName);
+                Debug.Log("Deleted Folders:\n" + string.Join("\n", emptyDirectoryNames));
+            }
+            else
+            {
+                Debug.Log("No empty directories found");
+            }
+
             AssetDatabase.Refresh();
         }
 
         public static IReadOnlyList<DirectoryInfo> GetEmptyDirectories()
         {
+            Debug.Log(Application.dataPath);
             var directoriesToDelete = new List<DirectoryInfo>();
 
             var directoryInfo = new DirectoryInfo(Application.dataPath);
@@ -38,7 +47,8 @@ namespace FolderCleaner
             var projectDirectories = directoryInfo.GetDirectories("*.*", SearchOption.AllDirectories)
                 .Where(x => ShouldScan(x.FullName, foldersToIgnore.Select(s => s.FullName)));
 
-            Debug.Log("Directories to scan:\n" + string.Join("\n", projectDirectories.Select(pd => pd.FullName)));
+            Debug.Log("Directories to scan:\n" + string.Join("\n",
+                projectDirectories.Select(GetRootDirectoryName)));
 
             foreach (var subDirectory in projectDirectories)
             {
@@ -50,6 +60,11 @@ namespace FolderCleaner
 
             // Order them to ensure that we delete them from nested to root
             return directoriesToDelete.OrderByDescending(dtd => dtd.FullName.Length).ToArray();
+        }
+
+        public static string GetRootDirectoryName(DirectoryInfo dirInfo)
+        {
+            return dirInfo.FullName.Substring(dirInfo.FullName.IndexOf("Assets", StringComparison.Ordinal));
         }
 
         private static bool ShouldScan(string folder, IEnumerable<string> ignored)
