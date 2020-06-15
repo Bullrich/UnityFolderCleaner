@@ -6,12 +6,29 @@ using UnityEngine;
 
 public class CleanEmptyFolders : EditorWindow
 {
-    private static string deletedFolders;
-
     [MenuItem("Window/Tools/Clean Empty Folders")]
     private static void Cleanup()
     {
-        deletedFolders = string.Empty;
+        var emptyDirectories = GetEmptyDirectories();
+
+        var emptyDirectoryNames = emptyDirectories.Select(ed => ed.FullName);
+
+        foreach (var directory in emptyDirectories)
+        {
+            if (directory.Exists)
+            {
+                directory.Delete(true);
+            }
+        }
+
+        Debug.Log("Deleted Folders:\n" +
+                  (emptyDirectories.Count > 0 ? string.Join("\n", emptyDirectoryNames) : "NONE"));
+        AssetDatabase.Refresh();
+    }
+
+    private static IReadOnlyList<DirectoryInfo> GetEmptyDirectories()
+    {
+        var directoriesToDelete = new List<DirectoryInfo>();
 
         var directoryInfo = new DirectoryInfo(Application.dataPath);
 
@@ -19,16 +36,18 @@ public class CleanEmptyFolders : EditorWindow
         var projectDirectories = directoryInfo.GetDirectories("*.*", SearchOption.AllDirectories)
             .Where(x => ShouldScan(x.FullName, foldersToIgnore.Select(s => s.FullName)));
 
+        Debug.Log("Directories to scan:\n" + string.Join("\n", projectDirectories.Select(pd => pd.FullName)));
+
         foreach (var subDirectory in projectDirectories)
         {
-            if (subDirectory.Exists)
+            if (IsDirectoryEmpty(subDirectory))
             {
-                ScanDirectory(subDirectory);
+                directoriesToDelete.Add(subDirectory);
             }
         }
 
-        Debug.Log("Deleted Folders:\n" + (deletedFolders.Length > 0 ? deletedFolders : "NONE"));
-        AssetDatabase.Refresh();
+        // Order them to ensure that we delete them from nested to root
+        return directoriesToDelete.OrderByDescending(dtd => dtd.FullName.Length).ToArray();
     }
 
     private static bool ShouldScan(string folder, IEnumerable<string> ignored)
@@ -41,19 +60,20 @@ public class CleanEmptyFolders : EditorWindow
         return true;
     }
 
-    private static string ScanDirectory(DirectoryInfo subDirectory)
+    private static bool IsDirectoryEmpty(DirectoryInfo subDirectory)
     {
-        Debug.Log("Scanning Directory: " + subDirectory.FullName);
+        if (!subDirectory.Exists)
+        {
+            return false;
+        }
 
         var filesInSubDirectory = subDirectory.GetFiles("*.*", SearchOption.AllDirectories);
 
-        if (filesInSubDirectory.Length == 0 ||
-            !filesInSubDirectory.Any(t => t.FullName.EndsWith(".meta") == false))
+        if (filesInSubDirectory.Length == 0 || filesInSubDirectory.All(t => t.FullName.EndsWith(".meta")))
         {
-            deletedFolders += subDirectory.FullName + "\n";
-            subDirectory.Delete(true);
+            return true;
         }
 
-        return deletedFolders;
+        return false;
     }
 }
