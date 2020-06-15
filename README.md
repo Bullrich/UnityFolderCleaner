@@ -21,7 +21,8 @@ It will scan all the folders in your project and delete empty folders.
   * Add `dev.bullrich.folder-cleaner` to `dependencies`, stating the latest version.
 
   A minimal example ends up looking like this. 
-  Please note that the version `X.Y.Z` stated here is to be replaced with the latest released version which is currently ![Release][Version-Release].
+  Please note that the version `X.Y.Z` stated here is to be replaced with the latest released version which is currently 
+  [![openupm](https://img.shields.io/npm/v/dev.bullrich.folder-cleaner?label=openupm&registry_uri=https://package.openupm.com)][OpenUPM].
   ```json
   {
     "scopedRegistries": [
@@ -41,4 +42,4 @@ It will scan all the folders in your project and delete empty folders.
 * Switch back to the Unity software and wait for it to finish importing the added package.
 
 [Project-Manifest]: https://docs.unity3d.com/Manual/upm-manifestPrj.html
-[Version-Release]: https://img.shields.io/github/release/Bullrich/UnityFolderCleaner.svg
+[OpenUPM]: https://openupm.com/packages/dev.bullrich.folder-cleaner/
