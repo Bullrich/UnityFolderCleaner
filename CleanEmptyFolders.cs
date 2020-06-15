@@ -4,76 +4,79 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-public class CleanEmptyFolders : EditorWindow
+namespace FolderCleaner
 {
-    [MenuItem("Window/Tools/Clean Empty Folders")]
-    private static void Cleanup()
+    public class CleanEmptyFolders : EditorWindow
     {
-        var emptyDirectories = GetEmptyDirectories();
-
-        var emptyDirectoryNames = emptyDirectories.Select(ed => ed.FullName);
-
-        foreach (var directory in emptyDirectories)
+        [MenuItem("Window/Tools/Clean Empty Folders")]
+        private static void Cleanup()
         {
-            if (directory.Exists)
+            var emptyDirectories = GetEmptyDirectories();
+
+            var emptyDirectoryNames = emptyDirectories.Select(ed => ed.FullName);
+
+            foreach (var directory in emptyDirectories)
             {
-                directory.Delete(true);
+                if (directory.Exists)
+                {
+                    directory.Delete(true);
+                }
             }
+
+            Debug.Log("Deleted Folders:\n" +
+                      (emptyDirectories.Count > 0 ? string.Join("\n", emptyDirectoryNames) : "NONE"));
+            AssetDatabase.Refresh();
         }
 
-        Debug.Log("Deleted Folders:\n" +
-                  (emptyDirectories.Count > 0 ? string.Join("\n", emptyDirectoryNames) : "NONE"));
-        AssetDatabase.Refresh();
-    }
-
-    private static IReadOnlyList<DirectoryInfo> GetEmptyDirectories()
-    {
-        var directoriesToDelete = new List<DirectoryInfo>();
-
-        var directoryInfo = new DirectoryInfo(Application.dataPath);
-
-        var foldersToIgnore = directoryInfo.GetDirectories(".git", SearchOption.AllDirectories);
-        var projectDirectories = directoryInfo.GetDirectories("*.*", SearchOption.AllDirectories)
-            .Where(x => ShouldScan(x.FullName, foldersToIgnore.Select(s => s.FullName)));
-
-        Debug.Log("Directories to scan:\n" + string.Join("\n", projectDirectories.Select(pd => pd.FullName)));
-
-        foreach (var subDirectory in projectDirectories)
+        private static IReadOnlyList<DirectoryInfo> GetEmptyDirectories()
         {
-            if (IsDirectoryEmpty(subDirectory))
+            var directoriesToDelete = new List<DirectoryInfo>();
+
+            var directoryInfo = new DirectoryInfo(Application.dataPath);
+
+            var foldersToIgnore = directoryInfo.GetDirectories(".git", SearchOption.AllDirectories);
+            var projectDirectories = directoryInfo.GetDirectories("*.*", SearchOption.AllDirectories)
+                .Where(x => ShouldScan(x.FullName, foldersToIgnore.Select(s => s.FullName)));
+
+            Debug.Log("Directories to scan:\n" + string.Join("\n", projectDirectories.Select(pd => pd.FullName)));
+
+            foreach (var subDirectory in projectDirectories)
             {
-                directoriesToDelete.Add(subDirectory);
+                if (IsDirectoryEmpty(subDirectory))
+                {
+                    directoriesToDelete.Add(subDirectory);
+                }
             }
+
+            // Order them to ensure that we delete them from nested to root
+            return directoriesToDelete.OrderByDescending(dtd => dtd.FullName.Length).ToArray();
         }
 
-        // Order them to ensure that we delete them from nested to root
-        return directoriesToDelete.OrderByDescending(dtd => dtd.FullName.Length).ToArray();
-    }
-
-    private static bool ShouldScan(string folder, IEnumerable<string> ignored)
-    {
-        if (ignored.Any(folder.StartsWith))
+        private static bool ShouldScan(string folder, IEnumerable<string> ignored)
         {
-            return false;
-        }
+            if (ignored.Any(folder.StartsWith))
+            {
+                return false;
+            }
 
-        return true;
-    }
-
-    private static bool IsDirectoryEmpty(DirectoryInfo subDirectory)
-    {
-        if (!subDirectory.Exists)
-        {
-            return false;
-        }
-
-        var filesInSubDirectory = subDirectory.GetFiles("*.*", SearchOption.AllDirectories);
-
-        if (filesInSubDirectory.Length == 0 || filesInSubDirectory.All(t => t.FullName.EndsWith(".meta")))
-        {
             return true;
         }
 
-        return false;
+        private static bool IsDirectoryEmpty(DirectoryInfo subDirectory)
+        {
+            if (!subDirectory.Exists)
+            {
+                return false;
+            }
+
+            var filesInSubDirectory = subDirectory.GetFiles("*.*", SearchOption.AllDirectories);
+
+            if (filesInSubDirectory.Length == 0 || filesInSubDirectory.All(t => t.FullName.EndsWith(".meta")))
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }
