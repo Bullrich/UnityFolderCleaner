@@ -28,7 +28,7 @@ namespace FolderCleaner
             AssetDatabase.Refresh();
         }
 
-        private static IReadOnlyList<DirectoryInfo> GetEmptyDirectories()
+        public static IReadOnlyList<DirectoryInfo> GetEmptyDirectories()
         {
             var directoriesToDelete = new List<DirectoryInfo>();
 
