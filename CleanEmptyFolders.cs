@@ -14,7 +14,6 @@ namespace FolderCleaner
         {
             var emptyDirectories = GetEmptyDirectories();
 
-
             foreach (var directory in emptyDirectories)
             {
                 if (directory.Exists)
@@ -38,25 +37,20 @@ namespace FolderCleaner
 
         public static IReadOnlyList<DirectoryInfo> GetEmptyDirectories()
         {
-            Debug.Log(Application.dataPath);
-            var directoriesToDelete = new List<DirectoryInfo>();
-
             var directoryInfo = new DirectoryInfo(Application.dataPath);
 
             var foldersToIgnore = directoryInfo.GetDirectories(".git", SearchOption.AllDirectories);
             var projectDirectories = directoryInfo.GetDirectories("*.*", SearchOption.AllDirectories)
                 .Where(x => ShouldScan(x.FullName, foldersToIgnore.Select(s => s.FullName)));
 
+#if FOLDER_CLEANER_VERBOSE
             Debug.Log("Directories to scan:\n" + string.Join("\n",
                 projectDirectories.Select(GetRootDirectoryName)));
+#else
+            Debug.Log($"Scanning {projectDirectories.Count()} directories");
+#endif
 
-            foreach (var subDirectory in projectDirectories)
-            {
-                if (IsDirectoryEmpty(subDirectory))
-                {
-                    directoriesToDelete.Add(subDirectory);
-                }
-            }
+            var directoriesToDelete = projectDirectories.Where(IsDirectoryEmpty);
 
             // Order them to ensure that we delete them from nested to root
             return directoriesToDelete.OrderByDescending(dtd => dtd.FullName.Length).ToArray();
