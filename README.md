@@ -1,5 +1,7 @@
 # Unity Folder Cleaner
 
+[![CodeFactor](https://www.codefactor.io/repository/github/bullrich/unityfoldercleaner/badge)](https://www.codefactor.io/repository/github/bullrich/unityfoldercleaner)
+
 Small utility to delete empty folder from the Unity project.
 
 Based from a script in [Unity3D College](https://unity3d.college/2017/06/28/removing-empty-unity-folders-meta-files/)
