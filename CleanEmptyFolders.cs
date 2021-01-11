@@ -19,6 +19,8 @@ namespace FolderCleaner
                 if (directory.Exists)
                 {
                     directory.Delete(true);
+                    var directoryMetaFiletPath = $"{directory.FullName}.meta";
+                    FileUtil.DeleteFileOrDirectory(directoryMetaFiletPath);
                 }
             }
 
