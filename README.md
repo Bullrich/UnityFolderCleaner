@@ -24,7 +24,7 @@ You can install this package using [OpenUPM](https://openupm.com/)'s command lin
 
 * Navigate to the `Packages` directory of your project.
 * Adjust the [project manifest file][Project-Manifest] `manifest.json` in a text editor.
-  * Ensure `https://registry.npmjs.org/` is part of `scopedRegistries`.
+  * Ensure `https://package.openupm.com` is part of `scopedRegistries`.
     * Ensure `dev.bullrich` is part of `scopes`.
   * Add `dev.bullrich.folder-cleaner` to `dependencies`, stating the latest version.
 
@@ -35,8 +35,8 @@ You can install this package using [OpenUPM](https://openupm.com/)'s command lin
   {
     "scopedRegistries": [
       {
-        "name": "npmjs",
-        "url": "https://registry.npmjs.org/",
+        "name": "package.openupm.com",
+        "url": "https://package.openupm.com",
         "scopes": [
           "dev.bullrich"
         ]
